@@ -12,7 +12,7 @@ import Alamofire
 import SwiftyJSON
 
 protocol OpenWeatherMapDelegate {
-    func updateWeatherInfo()
+    func updateWeatherInfo(weatherJson: JSON)
 }
 
 
@@ -23,16 +23,45 @@ class OpenWeatherMap {
     //let weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=2ea1fff5de0959c6314dcdae7c279d18"
     
     var nameCity: String?
-    //var temp:Int
+    var temp: Int?
     //var description: String
     //var currentTime: String?
     //var icon: UIImage?
     
     var delegate: OpenWeatherMapDelegate!
     
+    /*
     func getWeatherFor(_ city: String) {
-        let gorod = self.weatherUrl + "?q=" + city + ",uk&appid=2ea1fff5de0959c6314dcdae7c279d18"
-        let params = ["q" : city]
+        
+        let params = ["q":city]
+        
+        request(weatherUrl, method: .get, parameters: params).responseJSON{ respouns in
+            switch respouns.result {
+            case .failure(let error): print(error)
+            case .success:
+                //let weatherJson = JSON(respouns.result.value)
+                let weatherJson = JSON(respouns.result.value)
+                if let name = weatherJson["name"].string{
+                    self.nameCity = name
+                }
+                DispatchQueue.main.async {
+                    self.delegate.updateWeatherInfo()
+                }
+            default:print("")
+            }
+        }
+    }
+    */
+    
+    
+    
+    
+    //Work
+    
+    func getWeatherFor(_ city: inout String) {
+        
+        setRequest(city: &city)
+        
         
         /*
         Alamofire.request("https://httpbin.org/get").responseJSON { response in
@@ -57,31 +86,43 @@ class OpenWeatherMap {
         }
  */
     */
-    
 
+}
     
+    
+    func setRequest(city: inout String){
+        city = city.capitalized
+        let gorod = self.weatherUrl + "?q=" + city + "&appid=2ea1fff5de0959c6314dcdae7c279d18"
         
-    
         Alamofire.request(gorod).responseJSON { (response) in
             if let json = response.result.value{
+                let weatherJSON = JSON(json)
+
+                /*
                 print(json)
                 print("=================================")
                 let weatherJSON = JSON(json)
                 print(weatherJSON)
                 print("=================================")
+                */
+                
+                
                 if let name = weatherJSON["name"].string {
                     self.nameCity = name
                 }
                 
+                if let temperatura = weatherJSON["main"]["temp"].double {
+                    self.temp = Int(temperatura - 273.15)
+                }
+                
                 DispatchQueue.main.async(execute: {
-                    self.delegate.updateWeatherInfo()
+                    self.delegate.updateWeatherInfo(weatherJson: weatherJSON)
                 })
             }
-        }
-
+    }
 }
     
-        
+    //==============================================
         
         /*
         request(gorod, method: .get, parameters: params).responseJSON{ (response) in
@@ -170,9 +211,15 @@ class OpenWeatherMap {
         
         return dateFormator.string(from: weatherDate)
     }
-
+    
+    
+    func convertTempe(country:String, temperatura: Double) -> Int {
+        
+        if country == "US"{
+            return Int(((temperatura - 273.15)*1.8) + 32.0)
+        } else {
+            return Int(temperatura - 273.15)
+        }
+    }
 
 }
-
-
-

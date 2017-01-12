@@ -100,7 +100,7 @@ class ViewController: UIViewController, OpenWeatherMapDelegate {
             
             if let textField = (alert.textFields?.first)! as? UITextField {
                 //self.getWeatherFor(textField.text!)
-                self.openWeather.getWeatherFor(textField.text!)
+                self.openWeather.getWeatherFor(&textField.text!)
             }
         }
         
@@ -121,8 +121,30 @@ class ViewController: UIViewController, OpenWeatherMapDelegate {
     }
     
     //MARK: OpenWeatherMapDelegate
-    func updateWeatherInfo() {
-        print(openWeather.nameCity)
+    func updateWeatherInfo(weatherJson:JSON) {
+        //print(openWeather.nameCity)
+        //print(openWeather.temp)
+        
+        if let tempResult = weatherJson["main"]["temp"].double {
+            
+            //get country
+            
+            let country = weatherJson["sys"]["country"].stringValue
+            
+            //get city name
+            let cityName = weatherJson["name"].stringValue
+            print(cityName)
+            
+            //get temp
+            
+            let temperatura = openWeather.convertTempe(country: country, temperatura: tempResult)
+            
+            print(temperatura)
+            
+        } else {
+            print("Unable load weather info")
+        }
+        
     }
     
     /*
