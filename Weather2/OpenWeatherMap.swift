@@ -10,9 +10,11 @@ import Foundation
 import UIKit
 import Alamofire
 import SwiftyJSON
+import CoreLocation
 
 protocol OpenWeatherMapDelegate {
     func updateWeatherInfo(weatherJson: JSON)
+    func failure()
 }
 
 
@@ -57,6 +59,13 @@ class OpenWeatherMap {
     
     
     //Work
+    
+    
+    func weatherFor(geo: CLLocationCoordinate2D) {
+        //http://api.openweathermap.org/data/2.5/forecast/daily?lat=35&lon=139&cnt=10&mode=json&appid=b1b15e88fa797225412429c1c50c122a1
+        let params = ["lat" : geo.latitude,"lon" : geo.longitude]
+        
+    }
     
     func getWeatherFor(_ city: inout String) {
         
@@ -118,6 +127,8 @@ class OpenWeatherMap {
                 DispatchQueue.main.async(execute: {
                     self.delegate.updateWeatherInfo(weatherJson: weatherJSON)
                 })
+            } else {
+                self.delegate.failure()
             }
     }
 }
@@ -169,9 +180,60 @@ class OpenWeatherMap {
      
      }
      */
+    func updateWeatherIcon(condition: Int, nightTime: Bool) ->UIImage{
+        var imageName: String
+        switch (condition,nightTime) {
+                //Thunderstorm
+            case let(x,y) where x < 300 && y == true: imageName = "11n"
+            case let(x,y) where x < 300 && y == false: imageName = "11d"
+                //Drizle
+            case let(x,y) where x < 500 && y == true: imageName = "09n"
+            case let(x,y) where x < 500 && y == false: imageName = "09n"
+                //Rain
+            case let(x,y) where x <= 504 && y == true: imageName = "10n"
+            case let(x,y) where x <= 504 && y == false: imageName = "10d"
+            
+            case let(x,y) where x == 511 && y == true: imageName = "13n"
+            case let(x,y) where x == 511 && y == false: imageName = "13d"
+            
+            case let(x,y) where x < 600 && y == true: imageName = "09n"
+            case let(x,y) where x < 600 && y == false: imageName = "09d"
+            
+            //Snow
+            case let(x,y) where x < 700 && y == true: imageName = "13n"
+            case let(x,y) where x < 700 && y == false: imageName = "13n"
+            
+            //Atmosphere
+            case let(x,y) where x < 800 && y == true: imageName = "50n"
+            case let(x,y) where x < 800 && y == false: imageName = "50d"
+            
+            //Clouds
+            case let(x,y) where x == 800 && y == true: imageName = "01n"
+            case let(x,y) where x == 800 && y == false: imageName = "01d"
+            
+            case let(x,y) where x == 801 && y == true: imageName = "02n"
+            case let(x,y) where x == 801 && y == false: imageName = "02d"
+            
+            case let(x,y) where x > 802 && x < 804 && y == true: imageName = "03n"
+            case let(x,y) where x > 800 && x < 804 && y == true: imageName = "03d"
+            
+            case let(x,y) where x == 804 && y == true: imageName = "04n"
+            case let(x,y) where x == 804 && y == false: imageName = "04d"
+            
+            //Additional
+            case let(x,y) where x < 1000 && y == true: imageName = "11n"
+            case let(x,y) where x < 1000 && y == false: imageName = "11d"
+        
+        case let(x,y): imageName = "none"
+        
+        default: imageName = "none"
+        }
+        
+        let iconImage = UIImage(named: imageName)
+        return iconImage!
+    }
     
-    
-    
+    /*
     func weatherIcon(_ stringIcon: String) -> UIImage {
         
         let imageName: String
@@ -201,7 +263,21 @@ class OpenWeatherMap {
         let iconImage = UIImage(named: imageName)
         return iconImage!
     }
-    
+ */
+ 
+    func isTimeNight(weatherJson: JSON) -> Bool {
+        var nigthTime = false
+        let nowTime = NSDate().timeIntervalSince1970
+        let sunrise = weatherJson["sys"]["sunrise"].doubleValue
+        let sunset = weatherJson["sys"]["sunset"].doubleValue
+        
+        //?????????????????????
+        
+        if nowTime < sunrise || nowTime > sunset {
+            nigthTime = true
+        }
+        return nigthTime
+}
     func timeFromUnix(_ unixTime:Int) -> String {
         let timeInSecond = TimeInterval(unixTime)
         let weatherDate = Date(timeIntervalSince1970: timeInSecond)

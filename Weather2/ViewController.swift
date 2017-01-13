@@ -10,14 +10,17 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 import MBProgressHUD
+import CoreLocation
 
 
-class ViewController: UIViewController, OpenWeatherMapDelegate {
+class ViewController: UIViewController, OpenWeatherMapDelegate, CLLocationManagerDelegate {
     
     @IBOutlet weak var iconImageView: UIImageView!
     
-    var openWeather:OpenWeatherMap = OpenWeatherMap()
+    let locationManager:CLLocationManager = CLLocationManager()
     
+    var openWeather:OpenWeatherMap = OpenWeatherMap()
+    var hud = MBProgressHUD()
     @IBAction func cityTappedButom(_ sender: UIBarButtonItem) {
     
         displayCity()
@@ -29,6 +32,15 @@ class ViewController: UIViewController, OpenWeatherMapDelegate {
         // Do any additional setup after loading the view, typically from a nib.
         
         self.openWeather.delegate = self
+        
+        locationManager.delegate = self
+        
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
+        
+        locationManager.startUpdatingLocation()
+        
+        
         
         /*
          let stringURL = NSURL(string: url)
@@ -98,8 +110,10 @@ class ViewController: UIViewController, OpenWeatherMapDelegate {
         let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.default) {
             (action) -> Void in
             
+            
             if let textField = (alert.textFields?.first)! as? UITextField {
                 //self.getWeatherFor(textField.text!)
+                self.activityIndecator()
                 self.openWeather.getWeatherFor(&textField.text!)
             }
         }
@@ -113,12 +127,19 @@ class ViewController: UIViewController, OpenWeatherMapDelegate {
         
         
         self.present(alert, animated: true, completion: nil)
-        
-        
-        ///////////
-        
+
         
     }
+    
+    
+    func activityIndecator() {
+        hud.label.text = "Loading..."
+        hud.center = CGPoint(x: self.view.bounds.width/2, y: self.view.bounds.height/2)
+        hud.dimBackground = true
+        self.view.addSubview(hud)
+        hud.show(animated: true)
+    }
+    
     
     //MARK: OpenWeatherMapDelegate
     func updateWeatherInfo(weatherJson:JSON) {
@@ -127,19 +148,39 @@ class ViewController: UIViewController, OpenWeatherMapDelegate {
         
         if let tempResult = weatherJson["main"]["temp"].double {
             
-            //get country
             
+            
+            
+            hud.hide(animated: true)
+            
+            
+            
+            
+            //get country
             let country = weatherJson["sys"]["country"].stringValue
+            
+            
             
             //get city name
             let cityName = weatherJson["name"].stringValue
             print(cityName)
             
-            //get temp
             
+            
+            
+            //get temp
             let temperatura = openWeather.convertTempe(country: country, temperatura: tempResult)
             
             print(temperatura)
+            print(weatherJson["wind"]["speed"])
+            //get icon
+            
+            let weather = weatherJson["weather"][0]
+            let condition = weather["id"].intValue
+            let nightTime = openWeather.isTimeNight(weatherJson: weatherJson)
+            let icon = openWeather.updateWeatherIcon(condition: condition, nightTime: nightTime)
+            self.iconImageView.image = icon
+            
             
         } else {
             print("Unable load weather info")
@@ -147,12 +188,51 @@ class ViewController: UIViewController, OpenWeatherMapDelegate {
         
     }
     
+    
+    func failure() {
+        
+        //No connection internet
+        let netWorkController = UIAlertController(title: "Error", message: "No connection", preferredStyle: UIAlertControllerStyle.alert)
+        
+        let okButton = UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil)
+        
+        netWorkController.addAction(okButton)
+        self.present(netWorkController, animated: true, completion: nil)
+        
+    }
+    
+    
     /*
      func getWeatherFor(city:String) {
      print(city)
      }
      */
     
+    //MARK - CLLocationManagerDelegate
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print(manager.location)
+        
+        var curentLocation = locations.last as! CLLocation!
+        
+        if let cur = curentLocation?.horizontalAccuracy, cur > 0 {
+            
+            //stop updating location
+            locationManager.stopUpdatingLocation()
+            
+            let coords = CLLocationCoordinate2DMake((curentLocation?.coordinate.latitude)!, (curentLocation?.coordinate.longitude)!)
+            
+            self.openWeather.weatherFor(coords)
+            print(coords)
+            
+        }
+        
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+        print("We cant get you location")
+    }
 }
 
 

@@ -13,6 +13,7 @@
 		3275B54F1E23E33F00840094 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3275B54E1E23E33F00840094 /* Assets.xcassets */; };
 		3275B5521E23E33F00840094 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3275B5501E23E33F00840094 /* LaunchScreen.storyboard */; };
 		3275B63F1E24013200840094 /* OpenWeatherMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3275B63E1E24013200840094 /* OpenWeatherMap.swift */; };
+		818E3F711E2922E400F6B035 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 818E3F701E2922E400F6B035 /* CoreLocation.framework */; };
 		D9C33962F7D69CC10877F67D /* Pods_Weather2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FB6DF34448B45C8FBBCC547 /* Pods_Weather2.framework */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,8 @@
 		3275B63E1E24013200840094 /* OpenWeatherMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWeatherMap.swift; sourceTree = "<group>"; };
 		3FB6DF34448B45C8FBBCC547 /* Pods_Weather2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Weather2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		79D1E4C8EF4DF3075C718AD6 /* Pods-Weather2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Weather2.release.xcconfig"; path = "Pods/Target Support Files/Pods-Weather2/Pods-Weather2.release.xcconfig"; sourceTree = "<group>"; };
+		818E3F6F1E28F7F700F6B035 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
+		818E3F701E2922E400F6B035 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				818E3F711E2922E400F6B035 /* CoreLocation.framework in Frameworks */,
 				D9C33962F7D69CC10877F67D /* Pods_Weather2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -54,6 +58,7 @@
 		1469B4AEECA78805D1E7FC97 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				818E3F701E2922E400F6B035 /* CoreLocation.framework */,
 				3FB6DF34448B45C8FBBCC547 /* Pods_Weather2.framework */,
 			);
 			name = Frameworks;
@@ -87,6 +92,7 @@
 				3275B5501E23E33F00840094 /* LaunchScreen.storyboard */,
 				3275B5531E23E33F00840094 /* Info.plist */,
 				3275B63E1E24013200840094 /* OpenWeatherMap.swift */,
+				818E3F6F1E28F7F700F6B035 /* BridgingHeader.h */,
 			);
 			path = Weather2;
 			sourceTree = "<group>";
