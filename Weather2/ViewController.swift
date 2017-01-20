@@ -17,6 +17,14 @@ class ViewController: UIViewController, OpenWeatherMapDelegate, CLLocationManage
     
     @IBOutlet weak var iconImageView: UIImageView!
     
+    @IBOutlet weak var cityNameLabel:UILabel!
+    @IBOutlet weak var timelabel:UILabel!
+    @IBOutlet weak var templabel:UILabel!
+    @IBOutlet weak var speedWindLabel:UILabel!
+    @IBOutlet weak var humiditylabel:UILabel!
+    @IBOutlet weak var descriptionlabel:UILabel!
+    
+
     let locationManager:CLLocationManager = CLLocationManager()
     
     var openWeather:OpenWeatherMap = OpenWeatherMap()
@@ -39,56 +47,6 @@ class ViewController: UIViewController, OpenWeatherMapDelegate, CLLocationManage
         locationManager.requestWhenInUseAuthorization()
         
         locationManager.startUpdatingLocation()
-        
-        
-        
-        /*
-         let stringURL = NSURL(string: url)
-         
-         let weatherObject = NSData(contentsOfURL: stringURL!)
-         
-         //print(weatherObject)
-         
-         let session = NSURLSession.sharedSession()
-         
-         let task = session.downloadTaskWithURL(stringURL!) { (location:NSURL?, response:NSURLResponse?, error:NSError?) in
-         //print(response)
-         
-         let weatherData = NSData(contentsOfURL: stringURL!)
-         
-         do {
-         let weatherJson = try NSJSONSerialization.JSONObjectWithData(weatherData!, options: []) //as! NSDictionary
-         //print(weatherJson)
-         
-         
-         let weather = OpenWeatherMap(weatherJson: weatherJson as! NSDictionary)
-         
-         print(weather.nameCity)
-         print(weather.temp)
-         print(weather.description)
-         print(weather.currentTime!)
-         print(weather.icon!)
-         
-         
-         dispatch_async(dispatch_get_main_queue(), {
-         self.iconImageView.image = weather.icon!
-         })
-         
-         
-         } catch {
-         NSLog("Error:  \((error as NSError).localizedDescription)")
-         }
-         
-         }
-         
-         //каждую задачу необходимо запускать
-         task.resume()
-         */
-        
-        
-        
-        
-        
         
     }
     
@@ -143,8 +101,6 @@ class ViewController: UIViewController, OpenWeatherMapDelegate, CLLocationManage
     
     //MARK: OpenWeatherMapDelegate
     func updateWeatherInfo(weatherJson:JSON) {
-        //print(openWeather.nameCity)
-        //print(openWeather.temp)
         
         if let tempResult = weatherJson["main"]["temp"].double {
             
@@ -164,12 +120,21 @@ class ViewController: UIViewController, OpenWeatherMapDelegate, CLLocationManage
             //get city name
             let cityName = weatherJson["name"].stringValue
             print(cityName)
-            
+            self.cityNameLabel.text = "\(cityName), \(country)"
             
             
             
             //get temp
             let temperatura = openWeather.convertTempe(country: country, temperatura: tempResult)
+            
+            
+            //get time
+            
+            let time = weatherJson["dt"].intValue
+            
+            
+            
+            
             
             print(temperatura)
             print(weatherJson["wind"]["speed"])
@@ -202,11 +167,6 @@ class ViewController: UIViewController, OpenWeatherMapDelegate, CLLocationManage
     }
     
     
-    /*
-     func getWeatherFor(city:String) {
-     print(city)
-     }
-     */
     
     //MARK - CLLocationManagerDelegate
     
@@ -222,7 +182,7 @@ class ViewController: UIViewController, OpenWeatherMapDelegate, CLLocationManage
             
             let coords = CLLocationCoordinate2DMake((curentLocation?.coordinate.latitude)!, (curentLocation?.coordinate.longitude)!)
             
-            self.openWeather.weatherFor(coords)
+            self.openWeather.weatherFor(geo: coords)
             print(coords)
             
         }
